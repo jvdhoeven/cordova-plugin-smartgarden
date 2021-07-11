@@ -17,6 +17,16 @@
 
     </platform>
 
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="Smartgarden">
+                <param name="ios-package" value="CDVSmartgarden"/>
+            </feature>
+        </config-file>
+        <header-file src="src/ios/CDVSmartgarden.h" />
+        <source-file src="src/ios/CDVSmartgarden.m" />
+    </platform>
+
     <platform name="browser">
         <js-module src="src/browser/Smartgarden.js" name="SmartgardenBrowser">
             <merges target="smartgarden" />

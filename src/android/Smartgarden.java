@@ -1,7 +1,11 @@
 package de.joergv.smartgarden.plugin;
 
 import android.app.Activity;
+import android.util.DisplayMetrics;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.appcompat.widget.Toolbar;
 
@@ -10,6 +14,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.LOG;
+import org.apache.cordova.engine.SystemWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -40,8 +45,17 @@ public class Smartgarden extends CordovaPlugin {
             cordova.getActivity().runOnUiThread(new Runnable() {
                 public void run() {
                     Activity activity = cordova.getActivity();
+
                     BottomNavigationView bottomNavigationView = (BottomNavigationView) activity.findViewById(R.id.bottom_nav);
                     bottomNavigationView.setVisibility(View.VISIBLE);
+
+                    Integer pixels = 56 * ((int) activity.getApplicationContext().getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+
+                    SystemWebView theWebView = (SystemWebView) activity.findViewById(R.id.tutorialView);
+                    bottomNavigationView.getLayoutParams().height = pixels;
+                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) theWebView.getLayoutParams();
+                    params.bottomMargin = pixels;
+
                     callbackContext.success(); // Thread-safe.
                 }
             });
@@ -53,6 +67,12 @@ public class Smartgarden extends CordovaPlugin {
                     Activity activity = cordova.getActivity();
                     BottomNavigationView bottomNavigationView = (BottomNavigationView) activity.findViewById(R.id.bottom_nav);
                     bottomNavigationView.setVisibility(View.INVISIBLE);
+
+                    SystemWebView theWebView = (SystemWebView) activity.findViewById(R.id.tutorialView);
+                    bottomNavigationView.getLayoutParams().height = 0;
+                    ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) theWebView.getLayoutParams();
+                    params.bottomMargin = 0;
+
                     callbackContext.success(); // Thread-safe.
                 }
             });
@@ -63,22 +83,27 @@ public class Smartgarden extends CordovaPlugin {
             cordova.getActivity().runOnUiThread(new Runnable() {
                 public void run() {
                     Activity activity = cordova.getActivity();
+
                     BottomNavigationView bottomNavigationView = (BottomNavigationView) activity.findViewById(R.id.bottom_nav);
+
+                    Menu menu = bottomNavigationView.getMenu();
+                    MenuItem menuItem = menu.findItem(R.id.menu_select);
                     switch (item) {
-                        case "select":
-                            bottomNavigationView.setSelectedItemId(R.id.menu_select);
                         case "dashboard":
-                            bottomNavigationView.setSelectedItemId(R.id.menu_dashboard);
+                            menuItem = menu.findItem(R.id.menu_dashboard);
+                            break;
                         case "watering":
-                            bottomNavigationView.setSelectedItemId(R.id.menu_watering);
+                            menuItem = menu.findItem(R.id.menu_watering);
+                            break;
                         case "settings":
-                            bottomNavigationView.setSelectedItemId(R.id.menu_settings);
+                            menuItem = menu.findItem(R.id.menu_settings);
+                            break;
                     }
+                    menuItem.setChecked(true);
 
                     callbackContext.success(); // Thread-safe.
                 }
             });
-            return true;
         }
         return false;
     }
